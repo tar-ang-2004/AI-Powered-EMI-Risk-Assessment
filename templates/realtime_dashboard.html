@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block title %}Real-time Dashboard - AI EMI Risk Assessment{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Dashboard Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-lg shadow-lg mb-6">
+        <h1 class="text-3xl font-bold mb-2">🚀 Real-time ML Dashboard</h1>
+        <p class="text-blue-100">Live monitoring of EMI prediction models and system performance</p>
+        <div class="mt-4 flex items-center space-x-4">
+            <div class="flex items-center">
+                <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse mr-2"></div>
+                <span class="text-sm">System Status: Active</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-3 h-3 bg-blue-400 rounded-full animate-pulse mr-2"></div>
+                <span class="text-sm" id="lastUpdate">Last Update: Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Real-time Metrics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Active Users -->
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6 border-l-4 border-blue-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700">Active Users</h3>
+                    <p class="text-3xl font-bold text-blue-600" id="activeUsers">--</p>
+                </div>
+                <div class="text-blue-500">
+                    <i class="fas fa-users text-3xl"></i>
+                </div>
+            </div>
+            <p class="text-sm text-gray-500 mt-2">Currently online</p>
+        </div>
+
+        <!-- Predictions Per Minute -->
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6 border-l-4 border-green-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700">Predictions/Min</h3>
+                    <p class="text-3xl font-bold text-green-600" id="predictionsPerMin">--</p>
+                </div>
+                <div class="text-green-500">
+                    <i class="fas fa-chart-line text-3xl"></i>
+                </div>
+            </div>
+            <p class="text-sm text-gray-500 mt-2">Real-time throughput</p>
+        </div>
+
+        <!-- System Load -->
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6 border-l-4 border-yellow-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700">System Load</h3>
+                    <p class="text-3xl font-bold text-yellow-600" id="systemLoad">--%</p>
+                </div>
+                <div class="text-yellow-500">
+                    <i class="fas fa-server text-3xl"></i>
+                </div>
+            </div>
+            <p class="text-sm text-gray-500 mt-2">CPU & Memory usage</p>
+        </div>
+
+        <!-- Success Rate -->
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6 border-l-4 border-purple-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700">Success Rate</h3>
+                    <p class="text-3xl font-bold text-purple-600" id="successRate">--%</p>
+                </div>
+                <div class="text-purple-500">
+                    <i class="fas fa-check-circle text-3xl"></i>
+                </div>
+            </div>
+            <p class="text-sm text-gray-500 mt-2">Prediction accuracy</p>
+        </div>
+    </div>
+
+    <!-- Model Performance Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Classification Model Performance -->
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">🎯 Classification Model Performance</h3>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Model Accuracy</span>
+                    <span class="text-2xl font-bold text-green-600" id="classificationAccuracy">--</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3">
+                    <div class="bg-green-500 h-3 rounded-full transition-all duration-300" id="classificationAccuracyBar" style="width: 0%"></div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                    <div class="text-center">
+                        <p class="text-sm text-gray-500">Total Predictions</p>
+                        <p class="text-lg font-semibold" id="totalClassificationPredictions">--</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-sm text-gray-500">Avg Response Time</p>
+                        <p class="text-lg font-semibold" id="classificationResponseTime">--ms</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Regression Model Performance -->
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">📊 Regression Model Performance</h3>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">R² Score</span>
+                    <span class="text-2xl font-bold text-blue-600" id="regressionR2">--</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3">
+                    <div class="bg-blue-500 h-3 rounded-full transition-all duration-300" id="regressionR2Bar" style="width: 0%"></div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                    <div class="text-center">
+                        <p class="text-sm text-gray-500">Total Predictions</p>
+                        <p class="text-lg font-semibold" id="totalRegressionPredictions">--</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-sm text-gray-500">Avg Response Time</p>
+                        <p class="text-lg font-semibold" id="regressionResponseTime">--ms</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Real-time Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Predictions Timeline Chart -->
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">📈 Predictions Timeline</h3>
+            <div style="height: 300px;">
+                <canvas id="predictionsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- System Performance Chart -->
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">⚡ System Performance</h3>
+            <div style="height: 300px;">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Predictions Table -->
+    <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6 mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-gray-800">🔍 Recent Predictions</h3>
+            <button onclick="refreshPredictions()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                <i class="fas fa-refresh mr-2"></i>Refresh
+            </button>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full table-auto">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Timestamp</th>
+                        <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Model Type</th>
+                        <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Prediction</th>
+                        <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Confidence</th>
+                        <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Response Time</th>
+                    </tr>
+                </thead>
+                <tbody id="recentPredictionsTable">
+                    <tr>
+                        <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+                            <i class="fas fa-spinner fa-spin mr-2"></i>Loading recent predictions...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Model Status Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-4 text-center">
+            <div class="text-green-500 mb-2">
+                <i class="fas fa-check-circle text-2xl"></i>
+            </div>
+            <h4 class="font-semibold text-gray-700">Classification Model</h4>
+            <p class="text-sm text-gray-500" id="classificationStatus">Loaded ✅</p>
+        </div>
+        
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-4 text-center">
+            <div class="text-blue-500 mb-2">
+                <i class="fas fa-chart-area text-2xl"></i>
+            </div>
+            <h4 class="font-semibold text-gray-700">Regression Model</h4>
+            <p class="text-sm text-gray-500" id="regressionStatus">Loaded ✅</p>
+        </div>
+        
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-4 text-center">
+            <div class="text-purple-500 mb-2">
+                <i class="fas fa-balance-scale text-2xl"></i>
+            </div>
+            <h4 class="font-semibold text-gray-700">Data Scalers</h4>
+            <p class="text-sm text-gray-500" id="scalersStatus">Ready ✅</p>
+        </div>
+        
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-4 text-center">
+            <div class="text-orange-500 mb-2">
+                <i class="fas fa-database text-2xl"></i>
+            </div>
+            <h4 class="font-semibold text-gray-700">Data Pipeline</h4>
+            <p class="text-sm text-gray-500" id="pipelineStatus">Active ✅</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+// Auto-refresh dashboard every 5 seconds
+let refreshInterval;
+
+function startAutoRefresh() {
+    refreshInterval = setInterval(function() {
+        loadDashboardData();
+    }, 5000); // Refresh every 5 seconds
+}
+
+function stopAutoRefresh() {
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+    }
+}
+
+// Load dashboard data
+function loadDashboardData() {
+    fetch('/api/dashboard_data')
+        .then(response => response.json())
+        .then(data => {
+            updateDashboardMetrics(data);
+            updateCharts(data);
+            updateRecentPredictions(data.real_time_data.recent_predictions);
+        })
+        .catch(error => {
+            console.error('Error loading dashboard data:', error);
+        });
+}
+
+// Update dashboard metrics
+function updateDashboardMetrics(data) {
+    const realTimeData = data.real_time_data;
+    const systemStats = data.system_stats;
+    const performance = data.performance_metrics;
+    const mlflowMetrics = data.mlflow_metrics || {};
+    
+    // Update metric cards
+    document.getElementById('activeUsers').textContent = realTimeData.active_users || '--';
+    document.getElementById('predictionsPerMin').textContent = realTimeData.predictions_per_minute || '--';
+    document.getElementById('systemLoad').textContent = (realTimeData.system_load || 0).toFixed(1) + '%';
+    document.getElementById('successRate').textContent = ((performance.success_rate || 0) * 100).toFixed(1) + '%';
+    
+    // Prefer MLflow-provided metrics when available
+    const classificationValue = (mlflowMetrics.classification_accuracy != null) ? mlflowMetrics.classification_accuracy : realTimeData.model_performance?.classification_accuracy;
+    const regressionValue = (mlflowMetrics.regression_r2 != null) ? mlflowMetrics.regression_r2 : realTimeData.model_performance?.regression_r2;
+
+    const classificationAcc = ((classificationValue || 0) * 100).toFixed(1);
+    const regressionR2 = ((regressionValue || 0) * 100).toFixed(1);
+    
+    document.getElementById('classificationAccuracy').textContent = classificationAcc + '%';
+    document.getElementById('regressionR2').textContent = regressionR2 + '%';
+    
+    // Update progress bars
+    document.getElementById('classificationAccuracyBar').style.width = classificationAcc + '%';
+    document.getElementById('regressionR2Bar').style.width = regressionR2 + '%';
+    
+    // Update totals and response times - prefer MLflow metrics when present
+    const totalPreds = mlflowMetrics.total_predictions != null ? mlflowMetrics.total_predictions : (systemStats.total_predictions || '--');
+    const avgResp = mlflowMetrics.avg_response_time != null ? mlflowMetrics.avg_response_time : (systemStats.avg_prediction_time || 0);
+
+    document.getElementById('totalClassificationPredictions').textContent = totalPreds || '--';
+    document.getElementById('totalRegressionPredictions').textContent = totalPreds || '--';
+    document.getElementById('classificationResponseTime').textContent = (avgResp * 1000).toFixed(0) + 'ms';
+    document.getElementById('regressionResponseTime').textContent = (avgResp * 1000).toFixed(0) + 'ms';
+    
+    // Update last update time
+    document.getElementById('lastUpdate').textContent = 'Last Update: ' + new Date().toLocaleTimeString();
+    
+    // Update model status
+    const modelStatus = data.model_status;
+    document.getElementById('classificationStatus').textContent = modelStatus.classification_loaded ? 'Loaded ✅' : 'Not Loaded ❌';
+    document.getElementById('regressionStatus').textContent = modelStatus.regression_loaded ? 'Loaded ✅' : 'Not Loaded ❌';
+    document.getElementById('scalersStatus').textContent = modelStatus.scalers_loaded ? 'Ready ✅' : 'Not Ready ❌';
+    document.getElementById('pipelineStatus').textContent = 'Active ✅';
+}
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Real-time dashboard initialized');
+    loadDashboardData();
+    startAutoRefresh();
+    
+    // Load Chart.js if needed
+    if (typeof Chart === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        script.onload = function() {
+            initializeCharts();
+        };
+        document.head.appendChild(script);
+    } else {
+        initializeCharts();
+    }
+});
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', function() {
+    stopAutoRefresh();
+});
+</script>
+{% endblock %}

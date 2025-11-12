@@ -1,0 +1,29 @@
+{
+    "total_lenders": 8,
+    "lender_types": [
+        "Public Sector Bank",
+        "Private Bank",
+        "NBFC",
+        "Fintech"
+    ],
+    "rate_range": {
+        "min": 8.0,
+        "max": 13.5
+    },
+    "emi_range_for_500k": {
+        "min": 15668.18,
+        "max": 16967.64
+    },
+    "best_lenders": {
+        "excellent_credit": {
+            "lender": "State Bank of India",
+            "rate": 8.0,
+            "emi": 15668.18
+        },
+        "moderate_credit": {
+            "lender": "State Bank of India",
+            "rate": 9.0,
+            "emi": 15899.87
+        }
+    }
+}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMI Calculator Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-bold mb-4">Quick EMI Test</h2>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium">Loan Amount (₹)</label>
+                <input type="number" id="amount" value="100000" class="w-full p-2 border rounded">
+            </div>
+            <div>
+                <label class="block text-sm font-medium">Interest Rate (% p.a.)</label>
+                <input type="number" id="rate" value="10" step="0.1" class="w-full p-2 border rounded">
+            </div>
+            <div>
+                <label class="block text-sm font-medium">Tenure (months)</label>
+                <input type="number" id="tenure" value="12" class="w-full p-2 border rounded">
+            </div>
+            <button onclick="calculateTestEMI()" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+                Calculate EMI
+            </button>
+            <div id="result" class="p-4 bg-gray-50 rounded hidden">
+                <h3 class="font-semibold mb-2">Results:</h3>
+                <div id="emiResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateTestEMI() {
+            const principal = parseFloat(document.getElementById('amount').value);
+            const annualRate = parseFloat(document.getElementById('rate').value);
+            const tenureMonths = parseInt(document.getElementById('tenure').value);
+            
+            const monthlyRate = annualRate / (12 * 100);
+            
+            let emi, totalAmount, totalInterest;
+            
+            if (monthlyRate === 0) {
+                emi = principal / tenureMonths;
+                totalAmount = principal;
+                totalInterest = 0;
+            } else {
+                emi = (principal * monthlyRate * Math.pow(1 + monthlyRate, tenureMonths)) / 
+                      (Math.pow(1 + monthlyRate, tenureMonths) - 1);
+                totalAmount = emi * tenureMonths;
+                totalInterest = totalAmount - principal;
+            }
+            
+            document.getElementById('result').classList.remove('hidden');
+            document.getElementById('emiResult').innerHTML = `
+                <div class="space-y-2 text-sm">
+                    <div><strong>Monthly EMI:</strong> ₹${emi.toFixed(2)} (₹${Math.round(emi).toLocaleString()})</div>
+                    <div><strong>Total Amount:</strong> ₹${totalAmount.toFixed(2)}</div>
+                    <div><strong>Total Interest:</strong> ₹${totalInterest.toFixed(2)}</div>
+                    <div><strong>Principal:</strong> ₹${principal.toLocaleString()}</div>
+                    <div class="pt-2 border-t">
+                        <div class="text-xs text-gray-600">
+                            Formula: P × r × (1+r)^n / ((1+r)^n - 1)<br>
+                            Where P=${principal}, r=${monthlyRate.toFixed(6)}, n=${tenureMonths}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Auto-calculate on page load
+        calculateTestEMI();
+    </script>
+</body>
+</html>

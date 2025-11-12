@@ -1,0 +1,46 @@
+{
+    "generation_date": "2025-11-01 18:37:08",
+    "classification_metrics": [
+        {
+            "Model": "Loan Approval",
+            "Accuracy": 0.9210687156203615,
+            "Precision": 0.797987670941685,
+            "Recall": 0.7640952574801547,
+            "F1-Score": 0.7806737834465548,
+            "AUC": 0.970354226611052,
+            "Type": "Binary"
+        },
+        {
+            "Model": "EMI Eligibility",
+            "Accuracy": 0.9719985177865612,
+            "Precision": 0.9697970046859091,
+            "Recall": 0.9719985177865612,
+            "F1-Score": 0.9701850215793508,
+            "AUC": 0,
+            "Type": "Multiclass"
+        }
+    ],
+    "regression_metrics": [
+        {
+            "Model": "EMI Amount",
+            "RMSE": "\u20b93754.10",
+            "MAE": "\u20b92686.15",
+            "R\u00b2 Score": 0.765418342942177,
+            "MAPE": 150.39141527229876,
+            "RMSE_numeric": 3754.0986017677756,
+            "MAE_numeric": 2686.1538487598873,
+            "Samples": 64118
+        },
+        {
+            "Model": "Best Regression",
+            "RMSE": "\u20b9703.46",
+            "MAE": "\u20b9229.48",
+            "R\u00b2 Score": 0.9916177792337191,
+            "MAPE": 7.5897793717268,
+            "RMSE_numeric": 703.4603493593669,
+            "MAE_numeric": 229.4824129078016,
+            "Samples": 80960
+        }
+    ],
+    "total_models": 4
+}

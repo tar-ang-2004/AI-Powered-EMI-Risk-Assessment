@@ -1,0 +1,581 @@
+{% extends "base.html" %}
+
+{% block title %}Prepayment Analysis - AI EMI Risk Assessment{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-transparent py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="text-center mb-8 animate-fade-in-up">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">
+                <i class="fas fa-money-bill-wave text-primary-600 mr-3"></i>
+                Prepayment Analysis
+            </h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Analyze the benefits of prepaying your loan. Calculate savings, 
+                optimal prepayment amounts, and make informed decisions about early loan closure.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-8">
+            <!-- Loan Details & Prepayment Options (stacked layout: details on top, results below) -->
+            <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-8 card-enhanced w-full">
+                <!-- Form Header with Sample Data Button -->
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">
+                        <i class="fas fa-info-circle text-primary-600 mr-2"></i>
+                        Current Loan Details
+                    </h2>
+                    <button type="button" 
+                            onclick="fillSampleData('prepayment')" 
+                            class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 flex items-center">
+                        <i class="fas fa-magic mr-2"></i>
+                        Fill Sample Data
+                    </button>
+                </div>
+                
+                    <div class="space-y-6">
+                        <!-- Current Loan Information -->
+                    <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Existing Loan</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-floating-label">
+                                <input type="number" id="principalRemaining" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-white/40" placeholder=" " value="1500000">
+                                <label>Outstanding Principal (₹)</label>
+                            </div>
+                            <div class="form-floating-label">
+                                <input type="number" id="currentEMI" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-white/40" placeholder=" " value="18000">
+                                <label>Current EMI (₹)</label>
+                            </div>
+                            <div class="form-floating-label">
+                                <input type="number" id="interestRate" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-white/40" placeholder=" " value="8.5">
+                                <label>Interest Rate (%)</label>
+                            </div>
+                            <div class="form-floating-label">
+                                <input type="number" id="remainingTenure" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-white/40" placeholder=" " value="15">
+                                <label>Remaining Tenure (Years)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Prepayment Options -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Prepayment Strategy</h3>
+                        <div class="space-y-4">
+                            <!-- Strategy Selection -->
+                            <div class="form-floating-label">
+                                <select id="prepaymentStrategy" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-white/40" onchange="togglePrepaymentInputs()">
+                                    <option value="lumpsum">Lump Sum Payment</option>
+                                    <option value="emi_increase">Increase EMI</option>
+                                    <option value="regular_prepay">Regular Prepayments</option>
+                                    <option value="full_closure">Full Loan Closure</option>
+                                </select>
+                                <label>Prepayment Strategy</label>
+                            </div>
+
+                            <!-- Lump Sum Amount -->
+                            <div id="lumpsumInput" class="form-floating-label">
+                                <input type="number" id="prepaymentAmount" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-white/40" placeholder=" " value="200000">
+                                <label>Prepayment Amount (₹)</label>
+                            </div>
+
+                            <!-- EMI Increase Amount -->
+                            <div id="emiIncreaseInput" class="form-floating-label hidden">
+                                <input type="number" id="newEMI" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-white/40" placeholder=" " value="22000">
+                                <label>New EMI Amount (₹)</label>
+                            </div>
+
+                            <!-- Regular Prepayment -->
+                            <div id="regularPrepayInput" class="grid grid-cols-2 gap-4 hidden">
+                                <div class="form-floating-label">
+                                    <input type="number" id="regularAmount" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-white/40" placeholder=" " value="5000">
+                                    <label>Monthly Extra Payment (₹)</label>
+                                </div>
+                                <div class="form-floating-label">
+                                    <select id="prepayFrequency" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-white/40">
+                                        <option value="monthly">Monthly</option>
+                                        <option value="quarterly">Quarterly</option>
+                                        <option value="annually">Annually</option>
+                                    </select>
+                                    <label>Frequency</label>
+                                </div>
+                            </div>
+
+                            <!-- Prepayment Goal -->
+                            <div class="form-floating-label">
+                                <select id="prepaymentGoal" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-white/40">
+                                    <option value="reduce_tenure">Reduce Loan Tenure</option>
+                                    <option value="reduce_emi">Reduce EMI Amount</option>
+                                </select>
+                                <label>Prepayment Goal</label>
+                            </div>
+                        </div>
+                    </div>
+
+            <!-- Calculate Button -->
+            <button onclick="baseCalculatePrepayment()" 
+                class="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white py-3 px-6 rounded-lg font-semibold hover:from-primary-700 hover:to-primary-800 transform hover:scale-105 transition-all duration-200">
+                        <i class="fas fa-calculator mr-2"></i>
+                        Calculate Savings
+                    </button>
+                </div>
+            </div>
+
+            <!-- Analysis Results (moved below the inputs so results display under the form) -->
+            <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-8 card-enhanced w-full">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                    <i class="fas fa-chart-line text-success-600 mr-2"></i>
+                    Prepayment Benefits
+                </h2>
+                
+                <div id="prepaymentResults" class="hidden space-y-6">
+                    <!-- Savings Summary -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 text-center">
+                            <h4 class="text-sm font-medium text-gray-600 mb-1">Interest Savings</h4>
+                            <p id="interestSavings" class="text-2xl font-bold text-green-600">₹0</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 text-center">
+                            <h4 class="text-sm font-medium text-gray-600 mb-1">Time Saved</h4>
+                            <p id="timeSaved" class="text-2xl font-bold text-blue-600">0 Years</p>
+                        </div>
+                    </div>
+
+                    <!-- Before vs After Comparison -->
+                    <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-4">Before vs After Comparison</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Total Interest (Before):</span>
+                                <span id="totalInterestBefore" class="font-semibold">₹0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Total Interest (After):</span>
+                                <span id="totalInterestAfter" class="font-semibold text-green-600">₹0</span>
+                            </div>
+                            <div class="flex justify-between border-t pt-2">
+                                <span class="text-gray-600">Loan Tenure (Before):</span>
+                                <span id="tenureBefore" class="font-semibold">0 years</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Loan Tenure (After):</span>
+                                <span id="tenureAfter" class="font-semibold text-blue-600">0 years</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div>
+                        <canvas id="prepaymentChart" width="400" height="300"></canvas>
+                    </div>
+
+                    <!-- Recommendations -->
+                    <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg p-6">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-3">
+                            <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                            Smart Recommendations
+                        </h4>
+                        <div id="recommendations" class="space-y-2">
+                            <!-- Recommendations will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <div id="noResults" class="text-center py-12">
+                    <i class="fas fa-piggy-bank text-gray-300 text-6xl mb-4"></i>
+                    <p class="text-gray-500">Enter loan details to see prepayment benefits</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prepayment Strategies -->
+        <div class="mt-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-8 text-center">
+                <i class="fas fa-strategy text-purple-600 mr-2"></i>
+                Popular Prepayment Strategies
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6 card-enhanced text-center">
+                    <div class="w-16 h-16 glassmorphism-card backdrop-blur-md bg-green-500/20 border border-white/30 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <i class="fas fa-hand-holding-usd text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Bonus Prepayment</h3>
+                    <p class="text-gray-600 mb-4">Use annual bonuses, tax refunds, or windfalls to make lump sum prepayments.</p>
+                    <div class="text-sm text-green-600 font-semibold">Saves 15-25% on interest</div>
+                </div>
+
+                <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6 card-enhanced text-center">
+                    <div class="w-16 h-16 glassmorphism-card backdrop-blur-md bg-blue-500/20 border border-white/30 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <i class="fas fa-chart-line text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Step-Up EMI</h3>
+                    <p class="text-gray-600 mb-4">Increase EMI by 5-10% annually as your income grows over time.</p>
+                    <div class="text-sm text-blue-600 font-semibold">Reduces tenure by 30-40%</div>
+                </div>
+
+                <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6 card-enhanced text-center">
+                    <div class="w-16 h-16 glassmorphism-card backdrop-blur-md bg-purple-500/20 border border-white/30 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <i class="fas fa-calendar-check text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Regular Surplus</h3>
+                    <p class="text-gray-600 mb-4">Make small monthly extra payments from your monthly surplus.</p>
+                    <div class="text-sm text-purple-600 font-semibold">Consistent interest savings</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prepayment Calculator Tools -->
+        <div class="mt-12 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg p-8 text-white">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold mb-4">Advanced Prepayment Tools</h2>
+                <p class="text-xl">Explore different scenarios and optimize your prepayment strategy</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <button onclick="showOptimalAmount()" class="bg-white bg-opacity-20 hover:bg-opacity-30 py-3 px-4 rounded-lg font-semibold transition-all duration-200">
+                    <i class="fas fa-target mr-2"></i>
+                    Optimal Amount
+                </button>
+                <button onclick="showTenureComparison()" class="bg-white bg-opacity-20 hover:bg-opacity-30 py-3 px-4 rounded-lg font-semibold transition-all duration-200">
+                    <i class="fas fa-clock mr-2"></i>
+                    Tenure Analysis
+                </button>
+                <button onclick="showTaxBenefits()" class="bg-white bg-opacity-20 hover:bg-opacity-30 py-3 px-4 rounded-lg font-semibold transition-all duration-200">
+                    <i class="fas fa-receipt mr-2"></i>
+                    Tax Benefits
+                </button>
+                <button onclick="showCashFlow()" class="bg-white bg-opacity-20 hover:bg-opacity-30 py-3 px-4 rounded-lg font-semibold transition-all duration-200">
+                    <i class="fas fa-chart-area mr-2"></i>
+                    Cash Flow Impact
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePrepaymentInputs() {
+    const strategy = document.getElementById('prepaymentStrategy').value;
+    
+    // Hide all inputs first
+    document.getElementById('lumpsumInput').classList.add('hidden');
+    document.getElementById('emiIncreaseInput').classList.add('hidden');
+    document.getElementById('regularPrepayInput').classList.add('hidden');
+    
+    // Show relevant input based on strategy
+    switch(strategy) {
+        case 'lumpsum':
+        case 'full_closure':
+            document.getElementById('lumpsumInput').classList.remove('hidden');
+            break;
+        case 'emi_increase':
+            document.getElementById('emiIncreaseInput').classList.remove('hidden');
+            break;
+        case 'regular_prepay':
+            document.getElementById('regularPrepayInput').classList.remove('hidden');
+            break;
+    }
+}
+
+function baseCalculatePrepayment() {
+    console.log('baseCalculatePrepayment invoked');
+    try {
+        console.log('Input values:', {
+            principal: document.getElementById('principalRemaining')?.value,
+            currentEMI: document.getElementById('currentEMI')?.value,
+            interestRate: document.getElementById('interestRate')?.value,
+            remainingTenure: document.getElementById('remainingTenure')?.value
+        });
+    } catch (e) { console.warn('Error logging inputs', e); }
+    const principalRemaining = parseFloat(document.getElementById('principalRemaining').value) || 0;
+    const currentEMI = parseFloat(document.getElementById('currentEMI').value) || 0;
+    const interestRate = parseFloat(document.getElementById('interestRate').value) || 0;
+    const remainingTenure = parseFloat(document.getElementById('remainingTenure').value) || 0;
+    const strategy = document.getElementById('prepaymentStrategy').value;
+    const goal = document.getElementById('prepaymentGoal').value;
+    
+    if (!principalRemaining || !currentEMI || !interestRate || !remainingTenure) {
+        utils.showNotification('Please fill all required fields', 'error');
+        return;
+    }
+    
+    let prepaymentAmount = 0;
+    let newEMI = currentEMI;
+    
+    switch(strategy) {
+        case 'lumpsum':
+        case 'full_closure':
+            prepaymentAmount = parseFloat(document.getElementById('prepaymentAmount').value) || 0;
+            break;
+        case 'emi_increase':
+            newEMI = parseFloat(document.getElementById('newEMI').value) || currentEMI;
+            prepaymentAmount = newEMI - currentEMI;
+            break;
+        case 'regular_prepay':
+            const regularAmount = parseFloat(document.getElementById('regularAmount').value) || 0;
+            prepaymentAmount = regularAmount;
+            break;
+    }
+    
+    // Calculate original loan details
+    const monthlyRate = interestRate / (12 * 100);
+    const remainingMonths = Math.max(0, Math.round(remainingTenure * 12));
+
+    // Total interest without prepayment (defensive)
+    const totalInterestBefore = (currentEMI * remainingMonths) - principalRemaining;
+    
+    // Calculate with prepayment
+    let newPrincipal = principalRemaining;
+    let interestSavings = 0;
+    let newTenure = remainingTenure;
+    let totalInterestAfter = 0;
+    
+    if (strategy === 'full_closure') {
+        interestSavings = totalInterestBefore;
+        newTenure = 0;
+        totalInterestAfter = 0;
+    } else if (strategy === 'lumpsum') {
+        newPrincipal = principalRemaining - prepaymentAmount;
+        if (newPrincipal < 0) newPrincipal = 0;
+
+        if (goal === 'reduce_tenure') {
+            // Calculate new tenure (in months) with same EMI using standard amortization inverse
+            if (monthlyRate === 0) {
+                // Zero-interest loan
+                const months = newPrincipal > 0 && currentEMI > 0 ? Math.ceil(newPrincipal / currentEMI) : 0;
+                newTenure = months / 12;
+                totalInterestAfter = 0;
+            } else {
+                // n = log(EMI / (EMI - P*r)) / log(1 + r)
+                const denom = (currentEMI - newPrincipal * monthlyRate);
+                if (denom <= 0) {
+                    // EMI too small to amortize new principal — fallback to remainingTenure
+                    newTenure = remainingTenure;
+                    totalInterestAfter = (currentEMI * remainingMonths) - newPrincipal;
+                } else {
+                    const nMonths = Math.log(currentEMI / denom) / Math.log(1 + monthlyRate);
+                    const n = isFinite(nMonths) && nMonths > 0 ? nMonths : remainingMonths;
+                    newTenure = n / 12;
+                    totalInterestAfter = (currentEMI * n) - newPrincipal;
+                }
+            }
+        } else {
+            // Calculate new EMI with same tenure
+            if (monthlyRate === 0) {
+                newEMI = remainingMonths > 0 ? (newPrincipal / remainingMonths) : 0;
+            } else {
+                const pow = Math.pow(1 + monthlyRate, remainingMonths);
+                newEMI = remainingMonths > 0 ? (newPrincipal * monthlyRate * pow) / (pow - 1) : 0;
+            }
+            totalInterestAfter = (newEMI * remainingMonths) - newPrincipal;
+        }
+        interestSavings = totalInterestBefore - totalInterestAfter;
+    } else if (strategy === 'emi_increase') {
+        // Calculate new tenure with increased EMI
+        if (monthlyRate === 0) {
+            const months = newEMI > 0 ? Math.ceil(principalRemaining / newEMI) : remainingMonths;
+            newTenure = months / 12;
+            totalInterestAfter = 0;
+        } else {
+            const denom = (newEMI - principalRemaining * monthlyRate);
+            if (denom <= 0) {
+                newTenure = remainingTenure;
+                totalInterestAfter = (newEMI * remainingMonths) - principalRemaining;
+            } else {
+                const nMonths = Math.log(newEMI / denom) / Math.log(1 + monthlyRate);
+                const n = isFinite(nMonths) && nMonths > 0 ? nMonths : remainingMonths;
+                newTenure = n / 12;
+                totalInterestAfter = (newEMI * n) - principalRemaining;
+            }
+        }
+        interestSavings = totalInterestBefore - totalInterestAfter;
+    }
+    
+    const timeSaved = remainingTenure - newTenure;
+    
+    // Update UI
+    document.getElementById('interestSavings').textContent = utils.formatCurrency(interestSavings);
+    document.getElementById('timeSaved').textContent = timeSaved.toFixed(1) + ' Years';
+    document.getElementById('totalInterestBefore').textContent = utils.formatCurrency(totalInterestBefore);
+    document.getElementById('totalInterestAfter').textContent = utils.formatCurrency(totalInterestAfter);
+    document.getElementById('tenureBefore').textContent = remainingTenure.toFixed(1) + ' years';
+    document.getElementById('tenureAfter').textContent = newTenure.toFixed(1) + ' years';
+    
+    // Generate recommendations
+    generatePrepaymentRecommendations(strategy, interestSavings, timeSaved, prepaymentAmount);
+    
+    // Create chart (only if Chart.js is loaded) — otherwise hide canvas to avoid empty gap
+    try {
+        if (typeof Chart !== 'undefined') {
+            createPrepaymentChart(totalInterestBefore, totalInterestAfter, remainingTenure, newTenure);
+            document.getElementById('prepaymentChart').style.display = '';
+        } else {
+            // Chart.js not loaded yet — hide canvas to remove big empty gap
+            const canvas = document.getElementById('prepaymentChart');
+            if (canvas) canvas.style.display = 'none';
+        }
+    } catch (e) {
+        console.error('createPrepaymentChart error:', e);
+        const canvas = document.getElementById('prepaymentChart');
+        if (canvas) canvas.style.display = 'none';
+    }
+    
+    // Show results
+    const resultsEl = document.getElementById('prepaymentResults');
+    const noResultsEl = document.getElementById('noResults');
+    if (resultsEl) resultsEl.classList.remove('hidden');
+    if (noResultsEl) noResultsEl.classList.add('hidden');
+
+    // Expose a stable global alias so other scripts or the enhanced module can call the base calculation
+    try { window.baseCalculatePrepayment = baseCalculatePrepayment; } catch (e) { /* ignore */ }
+    
+    utils.showNotification('Prepayment analysis completed!', 'success');
+
+    // If an enhanced ML analyzer exists, call it non-blocking so ML results append under the base results
+    try {
+        if (typeof window.enhancedCalculatePrepayment === 'function') {
+            // give a tiny delay to ensure DOM updates from base calculation complete
+            setTimeout(() => {
+                try { window.enhancedCalculatePrepayment(); } catch (e) { console.warn('Enhanced analyzer failed', e); }
+            }, 75);
+        }
+    } catch (e) { console.warn('Error invoking enhanced analyzer', e); }
+}
+
+// Ensure the base function is available globally (defensive)
+try { window.baseCalculatePrepayment = baseCalculatePrepayment; } catch (e) { /* ignore */ }
+
+function generatePrepaymentRecommendations(strategy, savings, timeSaved, amount) {
+    const recommendations = [];
+    
+    if (savings > 100000) {
+        recommendations.push({
+            icon: 'fa-thumbs-up',
+            text: `Excellent! You'll save ₹${(savings/1000).toFixed(0)}K in interest. This is a great prepayment strategy.`,
+            type: 'success'
+        });
+    }
+    
+    if (timeSaved > 2) {
+        recommendations.push({
+            icon: 'fa-clock',
+            text: `You'll become debt-free ${timeSaved.toFixed(1)} years earlier. More financial freedom sooner!`,
+            type: 'info'
+        });
+    }
+    
+    if (strategy === 'lumpsum' && amount > 500000) {
+        recommendations.push({
+            icon: 'fa-info-circle',
+            text: 'Consider splitting large amounts into yearly prepayments for better tax planning.',
+            type: 'warning'
+        });
+    }
+    
+    if (savings < 50000) {
+        recommendations.push({
+            icon: 'fa-lightbulb',
+            text: 'Consider investing this amount if you can earn more than your loan interest rate.',
+            type: 'info'
+        });
+    }
+    
+    // Render recommendations
+    const container = document.getElementById('recommendations');
+    container.innerHTML = '';
+    
+    recommendations.forEach(rec => {
+        const div = document.createElement('div');
+        div.className = `flex items-center p-3 rounded-lg ${rec.type === 'success' ? 'bg-green-100 text-green-800' : rec.type === 'warning' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'}`;
+        div.innerHTML = `
+            <i class="fas ${rec.icon} mr-3"></i>
+            <span class="text-sm">${rec.text}</span>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function createPrepaymentChart(interestBefore, interestAfter, tenureBefore, tenureAfter) {
+    const ctx = document.getElementById('prepaymentChart').getContext('2d');
+    
+    if (window.prepaymentChart) {
+        window.prepaymentChart.destroy();
+    }
+    
+    window.prepaymentChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Interest Amount', 'Loan Tenure'],
+            datasets: [{
+                label: 'Before Prepayment',
+                data: [interestBefore, tenureBefore * 50000], // Scale tenure for visualization
+                backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                borderColor: 'rgba(239, 68, 68, 1)',
+                borderWidth: 1
+            }, {
+                label: 'After Prepayment',
+                data: [interestAfter, tenureAfter * 50000],
+                backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                borderColor: 'rgba(34, 197, 94, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value, index) {
+                            if (index === 0) return '₹' + (value/1000).toFixed(0) + 'K';
+                            return (value/50000).toFixed(1) + 'Y';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            if (context.datasetIndex === 0) {
+                                return context.dataset.label + ': ₹' + context.parsed.y.toLocaleString();
+                            } else {
+                                return context.dataset.label + ': ' + (context.parsed.y/50000).toFixed(1) + ' years';
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function showOptimalAmount() {
+    utils.showNotification('Optimal amount calculator coming soon!', 'info');
+}
+
+function showTenureComparison() {
+    utils.showNotification('Tenure comparison tool coming soon!', 'info');
+}
+
+function showTaxBenefits() {
+    utils.showNotification('Tax benefits calculator coming soon!', 'info');
+}
+
+function showCashFlow() {
+    utils.showNotification('Cash flow impact analysis coming soon!', 'info');
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    togglePrepaymentInputs();
+});
+
+// Load Chart.js if not already loaded
+if (typeof Chart === 'undefined') {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+    document.head.appendChild(script);
+}
+</script>
+<script src="{{ url_for('static', filename='js/prepayment_enhanced.js') }}"></script>
+{% endblock %}

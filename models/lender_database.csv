@@ -1,0 +1,9 @@
+code,name,type,base_rate,processing_fee_percent,credit_score_min,income_min,max_tenure
+SBI,State Bank of India,Public Sector Bank,8.5,0.5,700,25000,84
+HDFC,HDFC Bank,Private Bank,9.0,1.0,720,30000,72
+ICICI,ICICI Bank,Private Bank,9.25,1.5,710,25000,72
+AXIS,Axis Bank,Private Bank,9.75,1.25,715,30000,60
+BAJAJ,Bajaj Finance,NBFC,11.5,2.0,650,20000,60
+TATA,Tata Capital,NBFC,12.0,2.5,660,25000,48
+PAYSENSE,PaySense (Digital Lender),Fintech,13.5,3.0,600,15000,36
+MONEYTAP,MoneyTap,Fintech,14.0,2.5,580,12000,24

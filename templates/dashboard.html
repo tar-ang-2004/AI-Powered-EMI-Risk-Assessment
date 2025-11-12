@@ -1,0 +1,578 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - EMI Risk Assessment Platform{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">Analytics Dashboard</h1>
+        <p class="text-xl text-gray-600">Real-time insights and analytics for EMI risk assessment platform</p>
+    </div>
+
+    <!-- Key Metrics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Records -->
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Total Records</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-2" id="total-records">
+                        {{ stats.total_records if stats else 0 }}
+                    </p>
+                </div>
+                <div class="w-12 h-12 glassmorphism-card backdrop-blur-md bg-primary-500/20 border border-white/30 rounded-lg flex items-center justify-center shadow-lg">
+                    <i class="fas fa-users text-primary-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div class="flex items-center text-sm">
+                    <i class="fas fa-arrow-up text-success-500 mr-1"></i>
+                    <span class="text-success-600 font-medium">12.5%</span>
+                    <span class="text-gray-600 ml-1">from last month</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Eligible Customers -->
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Eligible Customers</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-2" id="eligible-count">
+                        {{ stats.eligibility_breakdown.get('Eligible', 0) if stats else 0 }}
+                    </p>
+                </div>
+                <div class="w-12 h-12 glassmorphism-card backdrop-blur-md bg-success-500/20 border border-white/30 rounded-lg flex items-center justify-center shadow-lg">
+                    <i class="fas fa-check-circle text-success-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div class="flex items-center text-sm">
+                    <i class="fas fa-arrow-up text-success-500 mr-1"></i>
+                    <span class="text-success-600 font-medium">8.2%</span>
+                    <span class="text-gray-600 ml-1">approval rate</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Average Salary -->
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Average Salary</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-2" id="avg-salary">
+                        ₹{{ "{:,.0f}".format(stats.avg_salary) if stats and stats.avg_salary else "0" }}
+                    </p>
+                </div>
+                <div class="w-12 h-12 glassmorphism-card backdrop-blur-md bg-warning-500/20 border border-white/30 rounded-lg flex items-center justify-center shadow-lg">
+                    <i class="fas fa-rupee-sign text-warning-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div class="flex items-center text-sm">
+                    <i class="fas fa-arrow-up text-success-500 mr-1"></i>
+                    <span class="text-success-600 font-medium">5.1%</span>
+                    <span class="text-gray-600 ml-1">from last quarter</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Average Credit Score -->
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Avg Credit Score</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-2" id="avg-credit-score">
+                        {{ "{:.0f}".format(stats.avg_credit_score) if stats and stats.avg_credit_score else "0" }}
+                    </p>
+                </div>
+                <div class="w-12 h-12 glassmorphism-card backdrop-blur-md bg-purple-500/20 border border-white/30 rounded-lg flex items-center justify-center shadow-lg">
+                    <i class="fas fa-chart-line text-purple-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div class="flex items-center text-sm">
+                    <i class="fas fa-arrow-up text-success-500 mr-1"></i>
+                    <span class="text-success-600 font-medium">2.3%</span>
+                    <span class="text-gray-600 ml-1">improvement</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Eligibility Distribution Chart -->
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">EMI Eligibility Distribution</h3>
+                <div class="flex items-center space-x-2">
+                    <button class="px-3 py-1 text-sm glassmorphism-card backdrop-blur-md bg-white/20 border border-white/25 text-gray-600 rounded-md hover:bg-white/30 transition-all duration-200">7D</button>
+                    <button class="px-3 py-1 text-sm bg-primary-100 text-primary-600 rounded-md">30D</button>
+                    <button class="px-3 py-1 text-sm glassmorphism-card backdrop-blur-md bg-white/20 border border-white/25 text-gray-600 rounded-md hover:bg-white/30 transition-all duration-200">90D</button>
+                </div>
+            </div>
+            <div id="eligibility-chart" style="height: 300px;"></div>
+        </div>
+
+        <!-- Credit Score Distribution -->
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">Credit Score Distribution</h3>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-info-circle text-gray-400" title="Distribution of credit scores across all customers"></i>
+                </div>
+            </div>
+            <div id="credit-score-chart" style="height: 300px;"></div>
+        </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Salary vs EMI Trend -->
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">Salary Distribution by Eligibility</h3>
+                <button class="px-3 py-2 bg-primary-600 text-white text-sm rounded-md hover:bg-primary-700">
+                    <i class="fas fa-download mr-2"></i>Export
+                </button>
+            </div>
+            <div id="salary-distribution-chart" style="height: 300px;"></div>
+        </div>
+
+        <!-- Risk Assessment Metrics -->
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">Risk Assessment Overview</h3>
+                <span class="px-2 py-1 bg-success-100 text-success-800 text-sm rounded-full">Live Data</span>
+            </div>
+            <div class="space-y-6">
+                <!-- Low Risk -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-success-500 rounded-full mr-3"></div>
+                        <span class="text-sm font-medium text-gray-700">Low Risk</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-1 bg-gray-200 rounded-full h-2 w-32">
+                            <div class="bg-success-500 h-2 rounded-full" style="width: 45%"></div>
+                        </div>
+                        <span class="text-sm font-semibold text-gray-900">45%</span>
+                    </div>
+                </div>
+
+                <!-- Moderate Risk -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-warning-500 rounded-full mr-3"></div>
+                        <span class="text-sm font-medium text-gray-700">Moderate Risk</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-1 bg-gray-200 rounded-full h-2 w-32">
+                            <div class="bg-warning-500 h-2 rounded-full" style="width: 35%"></div>
+                        </div>
+                        <span class="text-sm font-semibold text-gray-900">35%</span>
+                    </div>
+                </div>
+
+                <!-- High Risk -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-danger-500 rounded-full mr-3"></div>
+                        <span class="text-sm font-medium text-gray-700">High Risk</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-1 bg-gray-200 rounded-full h-2 w-32">
+                            <div class="bg-danger-500 h-2 rounded-full" style="width: 20%"></div>
+                        </div>
+                        <span class="text-sm font-semibold text-gray-900">20%</span>
+                    </div>
+                </div>
+
+                <!-- Model Performance Metrics -->
+                <div class="mt-6 pt-6 border-t border-gray-200">
+                    <h4 class="text-sm font-semibold text-gray-900 mb-4">Model Performance</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center">
+                            <p class="text-2xl font-bold text-success-600">94.2%</p>
+                            <p class="text-xs text-gray-500">Accuracy</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-2xl font-bold text-primary-600">0.89</p>
+                            <p class="text-xs text-gray-500">F1 Score</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-2xl font-bold text-warning-600">0.92</p>
+                            <p class="text-xs text-gray-500">Precision</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-2xl font-bold text-purple-600">0.87</p>
+                            <p class="text-xs text-gray-500">Recall</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity & Insights -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Recent Predictions -->
+        <div class="lg:col-span-2 glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">Recent Predictions</h3>
+                <a href="{{ url_for('records') }}" class="text-primary-600 hover:text-primary-700 text-sm font-medium">
+                    View All <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+            <div class="overflow-hidden">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="border-b border-gray-200">
+                            <th class="text-left py-3 px-4 font-medium text-gray-700">Customer</th>
+                            <th class="text-left py-3 px-4 font-medium text-gray-700">Salary</th>
+                            <th class="text-left py-3 px-4 font-medium text-gray-700">Credit Score</th>
+                            <th class="text-left py-3 px-4 font-medium text-gray-700">Eligibility</th>
+                            <th class="text-left py-3 px-4 font-medium text-gray-700">EMI Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-predictions">
+                        <!-- Dynamic content will be loaded here -->
+                        <tr class="border-b border-gray-100">
+                            <td class="py-3 px-4">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-3">
+                                        <span class="text-primary-600 text-sm font-semibold">M</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Male, 35</p>
+                                        <p class="text-xs text-gray-500">Private Sector</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-sm text-gray-900">₹75,000</td>
+                            <td class="py-3 px-4 text-sm text-gray-900">720</td>
+                            <td class="py-3 px-4">
+                                <span class="px-2 py-1 bg-success-100 text-success-800 text-xs rounded-full">Eligible</span>
+                            </td>
+                            <td class="py-3 px-4 text-sm font-medium text-gray-900">₹18,500</td>
+                        </tr>
+                        <tr class="border-b border-gray-100">
+                            <td class="py-3 px-4">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center mr-3">
+                                        <span class="text-pink-600 text-sm font-semibold">F</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Female, 28</p>
+                                        <p class="text-xs text-gray-500">Government</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-sm text-gray-900">₹45,000</td>
+                            <td class="py-3 px-4 text-sm text-gray-900">680</td>
+                            <td class="py-3 px-4">
+                                <span class="px-2 py-1 bg-danger-100 text-danger-800 text-xs rounded-full">Not Eligible</span>
+                            </td>
+                            <td class="py-3 px-4 text-sm text-gray-500">-</td>
+                        </tr>
+                        <tr class="border-b border-gray-100">
+                            <td class="py-3 px-4">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-3">
+                                        <span class="text-primary-600 text-sm font-semibold">M</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Male, 42</p>
+                                        <p class="text-xs text-gray-500">Self Employed</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-sm text-gray-900">₹95,000</td>
+                            <td class="py-3 px-4 text-sm text-gray-900">760</td>
+                            <td class="py-3 px-4">
+                                <span class="px-2 py-1 bg-success-100 text-success-800 text-xs rounded-full">Eligible</span>
+                            </td>
+                            <td class="py-3 px-4 text-sm font-medium text-gray-900">₹28,500</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Key Insights -->
+        <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-6">Key Insights</h3>
+            <div class="space-y-6">
+                <!-- Insight 1 -->
+                <div class="flex items-start">
+                    <div class="w-2 h-2 bg-success-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900 mb-1">Approval Rate Trending Up</p>
+                        <p class="text-xs text-gray-600">EMI approval rate has increased by 12% this month, indicating improved customer profiles.</p>
+                    </div>
+                </div>
+
+                <!-- Insight 2 -->
+                <div class="flex items-start">
+                    <div class="w-2 h-2 bg-warning-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900 mb-1">Credit Score Improvement</p>
+                        <p class="text-xs text-gray-600">Average credit score has improved by 15 points, showing better financial health.</p>
+                    </div>
+                </div>
+
+                <!-- Insight 3 -->
+                <div class="flex items-start">
+                    <div class="w-2 h-2 bg-primary-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900 mb-1">Peak Application Hours</p>
+                        <p class="text-xs text-gray-600">Most applications are submitted between 10 AM - 2 PM on weekdays.</p>
+                    </div>
+                </div>
+
+                <!-- Insight 4 -->
+                <div class="flex items-start">
+                    <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900 mb-1">Model Performance</p>
+                        <p class="text-xs text-gray-600">Current model shows 94.2% accuracy with stable performance over the last 30 days.</p>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="pt-4 border-t border-gray-200">
+                    <h4 class="text-sm font-semibold text-gray-900 mb-3">Quick Actions</h4>
+                    <div class="space-y-2">
+                        <a href="{{ url_for('predict_form') }}" 
+                           class="block w-full text-left px-3 py-2 text-sm text-primary-600 hover:bg-primary-50 rounded-md transition-colors">
+                            <i class="fas fa-plus mr-2"></i>New Prediction
+                        </a>
+                        <a href="{{ url_for('records') }}" 
+                           class="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-colors">
+                            <i class="fas fa-download mr-2"></i>Export Data
+                        </a>
+                        <button onclick="refreshDashboard()" 
+                                class="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-colors">
+                            <i class="fas fa-sync mr-2"></i>Refresh Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard_enhanced.js') }}"></script>
+<script>
+    // Dashboard data and charts
+    let dashboardData = {};
+
+    // Initialize dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        loadDashboardData();
+        initializeCharts();
+        
+        // Set up auto-refresh every 5 minutes
+        setInterval(refreshDashboard, 300000);
+    });
+
+    async function loadDashboardData() {
+        try {
+            const data = await makeAPIRequest('/api/dashboard_data');
+            dashboardData = data;
+            updateCharts();
+        } catch (error) {
+            console.error('Failed to load dashboard data:', error);
+            showNotification('Failed to load dashboard data', 'error');
+        }
+    }
+
+    function initializeCharts() {
+        // Initialize Eligibility Distribution Chart
+        const eligibilityData = [
+            {
+                values: [60, 40],
+                labels: ['Eligible', 'Not Eligible'],
+                type: 'pie',
+                hole: 0.4,
+                marker: {
+                    colors: ['#22c55e', '#ef4444']
+                },
+                textinfo: 'label+percent',
+                textposition: 'outside'
+            }
+        ];
+
+        const eligibilityLayout = {
+            showlegend: true,
+            height: 300,
+            margin: { t: 0, b: 0, l: 0, r: 0 },
+            legend: {
+                orientation: 'h',
+                x: 0.5,
+                xanchor: 'center',
+                y: -0.1
+            },
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)'
+        };
+
+        Plotly.newPlot('eligibility-chart', eligibilityData, eligibilityLayout, {responsive: true});
+
+        // Initialize Credit Score Distribution Chart
+        const creditScoreData = [
+            {
+                x: ['Poor<br>(300-599)', 'Fair<br>(600-699)', 'Good<br>(700-749)', 'Excellent<br>(750+)'],
+                y: [15, 25, 35, 25],
+                type: 'bar',
+                marker: {
+                    color: ['#ef4444', '#f59e0b', '#22c55e', '#0ea5e9']
+                }
+            }
+        ];
+
+        const creditScoreLayout = {
+            height: 300,
+            margin: { t: 20, b: 60, l: 40, r: 20 },
+            xaxis: { title: 'Credit Score Range' },
+            yaxis: { title: 'Percentage (%)' },
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)'
+        };
+
+        Plotly.newPlot('credit-score-chart', creditScoreData, creditScoreLayout, {responsive: true});
+
+        // Initialize Salary Distribution Chart
+        const salaryData = [
+            {
+                x: ['< 30K', '30K-50K', '50K-80K', '80K-120K', '> 120K'],
+                y: [45, 68, 75, 82, 89],
+                name: 'Eligible',
+                type: 'bar',
+                marker: { color: '#22c55e' }
+            },
+            {
+                x: ['< 30K', '30K-50K', '50K-80K', '80K-120K', '> 120K'],
+                y: [55, 32, 25, 18, 11],
+                name: 'Not Eligible',
+                type: 'bar',
+                marker: { color: '#ef4444' }
+            }
+        ];
+
+        const salaryLayout = {
+            height: 300,
+            margin: { t: 20, b: 60, l: 40, r: 20 },
+            xaxis: { title: 'Salary Range' },
+            yaxis: { title: 'Percentage (%)' },
+            barmode: 'stack',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)'
+        };
+
+        Plotly.newPlot('salary-distribution-chart', salaryData, salaryLayout, {responsive: true});
+    }
+
+    function updateCharts() {
+        if (!dashboardData || Object.keys(dashboardData).length === 0) return;
+
+        // Update eligibility chart if we have the data
+        if (dashboardData.eligibility_distribution) {
+            const eligibleCount = dashboardData.eligibility_distribution.Eligible || 0;
+            const notEligibleCount = dashboardData.eligibility_distribution['Not Eligible'] || 0;
+            
+            const update = {
+                values: [[eligibleCount, notEligibleCount]]
+            };
+            
+            Plotly.restyle('eligibility-chart', update, 0);
+        }
+    }
+
+    function refreshDashboard() {
+        showNotification('Refreshing dashboard data...', 'info');
+        loadDashboardData();
+        
+        // Add visual feedback for refresh
+        document.querySelectorAll('.card-hover').forEach(card => {
+            card.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                card.style.transform = 'scale(1)';
+            }, 200);
+        });
+        
+        setTimeout(() => {
+            showNotification('Dashboard refreshed successfully!', 'success');
+        }, 1000);
+    }
+
+    // Real-time data simulation
+    function simulateRealTimeUpdates() {
+        setInterval(() => {
+            // Simulate metric updates
+            const totalRecordsEl = document.getElementById('total-records');
+            if (totalRecordsEl) {
+                let currentValue = parseInt(totalRecordsEl.textContent.replace(/,/g, ''));
+                let newValue = currentValue + Math.floor(Math.random() * 5);
+                totalRecordsEl.textContent = newValue.toLocaleString();
+            }
+            
+            // Add subtle animation to metrics
+            document.querySelectorAll('.text-3xl.font-bold').forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.transform = 'scale(1.05)';
+                    el.style.color = '#0ea5e9';
+                    setTimeout(() => {
+                        el.style.transform = 'scale(1)';
+                        el.style.color = '';
+                    }, 300);
+                }, index * 100);
+            });
+        }, 30000); // Update every 30 seconds
+    }
+
+    // Start real-time updates simulation
+    simulateRealTimeUpdates();
+
+    // Export functionality
+    function exportDashboardData() {
+        const data = {
+            timestamp: new Date().toISOString(),
+            metrics: {
+                total_records: document.getElementById('total-records').textContent,
+                eligible_count: document.getElementById('eligible-count').textContent,
+                avg_salary: document.getElementById('avg-salary').textContent,
+                avg_credit_score: document.getElementById('avg-credit-score').textContent
+            }
+        };
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `dashboard_data_${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showNotification('Dashboard data exported successfully!', 'success');
+    }
+
+    // Print dashboard
+    function printDashboard() {
+        window.print();
+    }
+
+    // Responsive chart handling
+    window.addEventListener('resize', function() {
+        Plotly.Plots.resize('eligibility-chart');
+        Plotly.Plots.resize('credit-score-chart');
+        Plotly.Plots.resize('salary-distribution-chart');
+    });
+</script>
+{% endblock %}

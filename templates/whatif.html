@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}What-If Analysis - AI EMI Risk Assessment{% endblock %}
+
+{% block content %}
+        <!-- Header -->
+        <div class="text-center mb-8 animate-fade-in-up">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">
+                <i class="fas fa-question-circle text-purple-600 mr-3"></i>
+                What-If Analysis
+            </h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Explore different scenarios and understand how changes in income, loan amount, 
+                or tenure affect your EMI and eligibility. Make informed financial decisions.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Scenario Builder -->
+            <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-8">
+                <!-- Form Header with Sample Data Button -->
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">
+                        <i class="fas fa-sliders-h text-purple-600 mr-2"></i>
+                        Scenario Builder
+                    </h2>
+                    <button type="button" 
+                            onclick="fillSampleData('whatIf')" 
+                            class="glassmorphism-button backdrop-blur-md bg-gradient-to-r from-purple-600/80 to-pink-600/80 hover:from-purple-700/90 hover:to-pink-700/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg flex items-center border border-white/30">
+                        <i class="fas fa-magic mr-2"></i>
+                        Fill Sample Data
+                    </button>
+                </div>
+                
+                <div class="space-y-6">
+                    <!-- Current vs New Scenario Toggle -->
+                    <div class="flex glassmorphism-input backdrop-blur-md bg-white/20 border border-white/25 rounded-lg p-1">
+                        <button id="currentTab" 
+                                class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all glassmorphism-card backdrop-blur-md bg-white/30 text-gray-900 shadow-sm border border-white/30"
+                                onclick="switchTab('current')">
+                            Current Scenario
+                        </button>
+                        <button id="newTab" 
+                                class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all text-gray-500"
+                                onclick="switchTab('new')">
+                            New Scenario
+                        </button>
+                    </div>
+
+                    <!-- Current Scenario Form -->
+                    <div id="currentScenario">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Current Financial Profile</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-floating-label">
+                                <input type="number" id="currentIncome" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-white/40" placeholder=" " value="75000">
+                                <label>Monthly Income (₹)</label>
+                            </div>
+                            <div class="form-floating-label">
+                                <input type="number" id="currentEMI" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-white/40" placeholder=" " value="18000">
+                                <label>Current EMI (₹)</label>
+                            </div>
+                            <div class="form-floating-label">
+                                <input type="number" id="currentLoanAmount" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-white/40" placeholder=" " value="2500000">
+                                <label>Loan Amount (₹)</label>
+                            </div>
+                            <div class="form-floating-label">
+                                <input type="number" id="currentTenure" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-white/40" placeholder=" " value="20">
+                                <label>Tenure (Years)</label>
+                            </div>
+                            <div class="form-floating-label">
+                                <input type="number" id="currentRate" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-white/40" placeholder=" " value="8.5">
+                                <label>Interest Rate (%)</label>
+                            </div>
+                            <div class="form-floating-label">
+                                <input type="number" id="currentCreditScore" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-white/40" placeholder=" " value="750">
+                                <label>Credit Score</label>
+                            </div>
+                        </div>
+                        
+                        <!-- Additional Profile Fields for ML Model -->
+                        <div class="mt-4">
+                            <h4 class="text-md font-medium text-gray-700 mb-3">Additional Profile Details (for ML Analysis)</h4>
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="form-floating-label">
+                                    <input type="number" id="age" class="glassmorphism-input w-full px-3 py-2 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-white/40" placeholder=" " value="30">
+                                    <label class="text-sm">Age</label>
+                                </div>
+                                <div class="form-floating-label">
+                                    <select id="gender" class="glassmorphism-input w-full px-3 py-2 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-white/40">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                    <label class="text-sm">Gender</label>
+                                </div>
+                                <div class="form-floating-label">
+                                    <select id="maritalStatus" class="glassmorphism-input w-full px-3 py-2 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-white/40">
+                                        <option value="Married">Married</option>
+                                        <option value="Single">Single</option>
+                                    </select>
+                                    <label class="text-sm">Marital Status</label>
+                                </div>
+                                <div class="form-floating-label">
+                                    <input type="number" id="bankBalance" class="glassmorphism-input w-full px-3 py-2 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-white/40" placeholder=" " value="200000">
+                                    <label class="text-sm">Bank Balance (₹)</label>
+                                </div>
+                                <div class="form-floating-label">
+                                    <input type="number" id="emergencyFund" class="glassmorphism-input w-full px-3 py-2 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-white/40" placeholder=" " value="100000">
+                                    <label class="text-sm">Emergency Fund (₹)</label>
+                                </div>
+                                <div class="form-floating-label">
+                                    <input type="number" id="yearsOfEmployment" class="glassmorphism-input w-full px-3 py-2 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-white/40" placeholder=" " value="5">
+                                    <label class="text-sm">Work Experience</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- New Scenario Form -->
+                    <div id="newScenario" class="hidden">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">What If Scenario</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-floating-label">
+                                <input type="number" id="newIncome" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-white/40" placeholder=" " value="90000">
+                                <label>Monthly Income (₹)</label>
+                            </div>
+                            <div class="form-floating-label">
+                                <input type="number" id="newEMI" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-white/40" placeholder=" " value="20000">
+                                <label>New EMI (₹)</label>
+                            </div>
+                            <div class="form-floating-label">
+                                <input type="number" id="newLoanAmount" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-white/40" placeholder=" " value="3000000">
+                                <label>Loan Amount (₹)</label>
+                            </div>
+                            <div class="form-floating-label">
+                                <input type="number" id="newTenure" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-white/40" placeholder=" " value="25">
+                                <label>Tenure (Years)</label>
+                            </div>
+                            <div class="form-floating-label">
+                                <input type="number" id="newRate" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-white/40" placeholder=" " value="7.8">
+                                <label>Interest Rate (%)</label>
+                            </div>
+                            <div class="form-floating-label">
+                                <input type="number" id="newCreditScore" class="glassmorphism-input w-full px-4 py-3 backdrop-blur-md bg-white/20 border border-white/25 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-white/40" placeholder=" " value="780">
+                                <label>Credit Score</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analyze Button -->
+                    <button onclick="analyzeScenarios()" 
+                            class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 px-6 rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transform hover:scale-105 transition-all duration-200">
+                        <i class="fas fa-chart-line mr-2"></i>
+                        Analyze Scenarios
+                    </button>
+                </div>
+            </div>
+
+            <!-- Analysis Results -->
+            <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-8 card-enhanced">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                    <i class="fas fa-analytics text-success-600 mr-2"></i>
+                    Impact Analysis
+                </h2>
+                
+                <div id="analysisResults" class="hidden space-y-6">
+                    <!-- Key Metrics Comparison -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-gray-600 mb-2">EMI Change</h4>
+                            <p id="emiChange" class="text-2xl font-bold text-blue-600">+₹0</p>
+                            <p id="emiChangePercent" class="text-sm text-gray-500">0% change</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-gray-600 mb-2">Eligibility Impact</h4>
+                            <p id="eligibilityChange" class="text-2xl font-bold text-green-600">Better</p>
+                            <p id="eligibilityScore" class="text-sm text-gray-500">Score: 850</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-gray-600 mb-2">Interest Savings</h4>
+                            <p id="interestSavings" class="text-2xl font-bold text-yellow-600">₹0</p>
+                            <p id="savingsPercent" class="text-sm text-gray-500">0% of total</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-gray-600 mb-2">Risk Level</h4>
+                            <p id="riskLevel" class="text-2xl font-bold text-purple-600">Low</p>
+                            <p id="riskScore" class="text-sm text-gray-500">Risk Score: 2.5</p>
+                        </div>
+                    </div>
+
+                    <!-- Chart -->
+                    <div>
+                        <canvas id="comparisonChart" width="400" height="200"></canvas>
+                    </div>
+
+                    <!-- Recommendations -->
+                    <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-3">
+                            <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                            Recommendations
+                        </h4>
+                        <div id="recommendations" class="space-y-2">
+                            <!-- Recommendations will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <div id="noAnalysis" class="text-center py-12">
+                    <i class="fas fa-chart-bar text-gray-300 text-6xl mb-4"></i>
+                    <p class="text-gray-500">Configure scenarios and click analyze to see impact</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenario Templates -->
+        <div class="mt-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">
+                <i class="fas fa-templates text-indigo-600 mr-2"></i>
+                Popular What-If Scenarios
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6 card-enhanced cursor-pointer" onclick="loadTemplate('income_increase')">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-arrow-up text-green-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Income Increase</h3>
+                        <p class="text-gray-600">What if your income increases by 20%?</p>
+                    </div>
+                </div>
+
+                <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6 card-enhanced cursor-pointer" onclick="loadTemplate('rate_decrease')">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-percentage text-blue-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Lower Interest Rate</h3>
+                        <p class="text-gray-600">Impact of 1% reduction in interest rate</p>
+                    </div>
+                </div>
+
+                <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-6 card-enhanced cursor-pointer" onclick="loadTemplate('tenure_extend')">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-clock text-purple-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Extended Tenure</h3>
+                        <p class="text-gray-600">Effect of extending loan tenure by 5 years</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+</script>
+<script src="{{ url_for('static', filename='js/whatif_enhanced.js') }}"></script>
+{% endblock %}

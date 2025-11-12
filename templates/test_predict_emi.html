@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction EMI Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-bold mb-4">Prediction Page EMI Test</h2>
+        
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div>
+                <h3 class="font-semibold mb-2">Test Case 1: Small Loan</h3>
+                <div class="text-sm space-y-1">
+                    <div>Amount: ₹5,00,000</div>
+                    <div>Tenure: 120 months (10 years)</div>
+                    <div>Rate: 8.5% p.a. (default)</div>
+                </div>
+                <button onclick="testCase1()" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded text-sm">Test</button>
+                <div id="result1" class="mt-2 p-2 bg-gray-50 rounded text-xs hidden"></div>
+            </div>
+            
+            <div>
+                <h3 class="font-semibold mb-2">Test Case 2: Home Loan</h3>
+                <div class="text-sm space-y-1">
+                    <div>Amount: ₹50,00,000</div>
+                    <div>Tenure: 240 months (20 years)</div>
+                    <div>Rate: 8.5% p.a. (default)</div>
+                </div>
+                <button onclick="testCase2()" class="mt-2 bg-green-500 text-white px-4 py-2 rounded text-sm">Test</button>
+                <div id="result2" class="mt-2 p-2 bg-gray-50 rounded text-xs hidden"></div>
+            </div>
+        </div>
+        
+        <div class="mt-6 p-4 bg-blue-50 rounded">
+            <h3 class="font-semibold mb-2">Expected vs Actual Results</h3>
+            <div id="comparison" class="text-sm"></div>
+        </div>
+    </div>
+
+    <script>
+        // Import the calculateCorrectPredictionEMI function logic
+        function calculateCorrectPredictionEMI(data) {
+            const principal = data.requested_amount || 1000000;
+            const tenureMonths = data.requested_tenure || 120;
+            const defaultAnnualRate = 8.5;
+            const monthlyRate = defaultAnnualRate / (12 * 100);
+            
+            let emi, totalAmount, totalInterest;
+            
+            if (monthlyRate === 0) {
+                emi = principal / tenureMonths;
+                totalAmount = principal;
+                totalInterest = 0;
+            } else {
+                emi = (principal * monthlyRate * Math.pow(1 + monthlyRate, tenureMonths)) / 
+                      (Math.pow(1 + monthlyRate, tenureMonths) - 1);
+                totalAmount = emi * tenureMonths;
+                totalInterest = totalAmount - principal;
+            }
+            
+            return {
+                predicted_amount: emi,
+                formatted_amount: `₹${Math.round(emi).toLocaleString()}`,
+                total_amount: totalAmount,
+                total_interest: totalInterest,
+                principal: principal,
+                rate: defaultAnnualRate,
+                tenure: tenureMonths
+            };
+        }
+
+        function testCase1() {
+            const data = {
+                requested_amount: 500000,
+                requested_tenure: 120,
+                monthly_salary: 60000
+            };
+            
+            const result = calculateCorrectPredictionEMI(data);
+            document.getElementById('result1').innerHTML = `
+                <strong>EMI:</strong> ${result.formatted_amount}<br>
+                <strong>Total:</strong> ₹${Math.round(result.total_amount).toLocaleString()}<br>
+                <strong>Interest:</strong> ₹${Math.round(result.total_interest).toLocaleString()}
+            `;
+            document.getElementById('result1').classList.remove('hidden');
+            updateComparison('case1', result);
+        }
+
+        function testCase2() {
+            const data = {
+                requested_amount: 5000000,
+                requested_tenure: 240,
+                monthly_salary: 100000
+            };
+            
+            const result = calculateCorrectPredictionEMI(data);
+            document.getElementById('result2').innerHTML = `
+                <strong>EMI:</strong> ${result.formatted_amount}<br>
+                <strong>Total:</strong> ₹${Math.round(result.total_amount).toLocaleString()}<br>
+                <strong>Interest:</strong> ₹${Math.round(result.total_interest).toLocaleString()}
+            `;
+            document.getElementById('result2').classList.remove('hidden');
+            updateComparison('case2', result);
+        }
+
+        function updateComparison(caseType, result) {
+            const comparison = document.getElementById('comparison');
+            const expected = caseType === 'case1' ? 
+                { emi: 6043.93, total: 725271, interest: 225271 } :
+                { emi: 43429.59, total: 10423102, interest: 5423102 };
+            
+            const actual = {
+                emi: result.predicted_amount,
+                total: result.total_amount,
+                interest: result.total_interest
+            };
+            
+            const emiMatch = Math.abs(expected.emi - actual.emi) < 1;
+            const totalMatch = Math.abs(expected.total - actual.total) < 100;
+            
+            comparison.innerHTML += `
+                <div class="mb-2 p-2 border rounded ${emiMatch ? 'border-green-300 bg-green-50' : 'border-red-300 bg-red-50'}">
+                    <strong>${caseType === 'case1' ? 'Case 1' : 'Case 2'}:</strong><br>
+                    EMI: Expected ₹${expected.emi.toFixed(2)}, Got ₹${actual.emi.toFixed(2)} ${emiMatch ? '✅' : '❌'}<br>
+                    Total: Expected ₹${expected.total.toLocaleString()}, Got ₹${Math.round(actual.total).toLocaleString()} ${totalMatch ? '✅' : '❌'}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

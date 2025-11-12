@@ -1,0 +1,668 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Records - EMI Risk Assessment Platform{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+        <div>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">Customer Records</h1>
+            <p class="text-xl text-gray-600">Manage and view all customer EMI assessment records</p>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-3 mt-4 sm:mt-0">
+            <button onclick="exportRecords()" class="px-4 py-2 bg-success-600 text-white rounded-lg hover:bg-success-700 transition-all duration-300 flex items-center">
+                <i class="fas fa-download mr-2"></i>
+                Export Data
+            </button>
+            <a href="{{ url_for('predict_form') }}" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-all duration-300 flex items-center">
+                <i class="fas fa-plus mr-2"></i>
+                New Assessment
+            </a>
+        </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <!-- Search -->
+            <div class="lg:col-span-2">
+                <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search Records</label>
+                <div class="relative">
+                    <input type="text" id="search" placeholder="Search by ID, age, salary..."
+                           class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Eligibility Filter -->
+            <div>
+                <label for="eligibility-filter" class="block text-sm font-medium text-gray-700 mb-2">Eligibility Status</label>
+                <select id="eligibility-filter" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200">
+                    <option value="">All Records</option>
+                    <option value="Eligible">Eligible</option>
+                    <option value="Not Eligible">Not Eligible</option>
+                </select>
+            </div>
+
+            <!-- Date Range -->
+            <div>
+                <label for="date-filter" class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+                <select id="date-filter" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200">
+                    <option value="">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                    <option value="year">This Year</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
+            <div class="text-center">
+                <p class="text-2xl font-bold text-primary-600">{{ total if total else 0 }}</p>
+                <p class="text-sm text-gray-600">Total Records</p>
+            </div>
+            <div class="text-center">
+                <p class="text-2xl font-bold text-success-600" id="eligible-count">-</p>
+                <p class="text-sm text-gray-600">Eligible</p>
+            </div>
+            <div class="text-center">
+                <p class="text-2xl font-bold text-danger-600" id="not-eligible-count">-</p>
+                <p class="text-sm text-gray-600">Not Eligible</p>
+            </div>
+            <div class="text-center">
+                <p class="text-2xl font-bold text-warning-600" id="avg-emi">-</p>
+                <p class="text-sm text-gray-600">Avg EMI</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Records Table -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('id')">
+                            ID <i class="fas fa-sort ml-1"></i>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Customer Details
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('salary')">
+                            Monthly Salary <i class="fas fa-sort ml-1"></i>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('credit_score')">
+                            Credit Score <i class="fas fa-sort ml-1"></i>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Eligibility
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Max EMI
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('date')">
+                            Date <i class="fas fa-sort ml-1"></i>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="records-tbody" class="bg-white divide-y divide-gray-200">
+                    {% if records %}
+                        {% for record in records %}
+                        <tr class="hover:bg-gray-50 transition-colors duration-200">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                #{{ record.id }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center mr-3">
+                                        <span class="text-primary-600 text-sm font-semibold">
+                                            {{ record.gender[0] if record.gender else 'U' }}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">
+                                            {{ record.gender if record.gender else 'Unknown' }}, {{ record.age if record.age else 'N/A' }} years
+                                        </div>
+                                        <div class="text-sm text-gray-500">
+                                            Credit Score: {{ record.credit_score if record.credit_score else 'N/A' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {% if record.monthly_salary %}
+                                    ₹{{ "{:,.0f}".format(record.monthly_salary) }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if record.credit_score %}
+                                    <div class="flex items-center">
+                                        <span class="text-sm font-medium text-gray-900">{{ record.credit_score }}</span>
+                                        {% if record.credit_score >= 750 %}
+                                            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-100 text-success-800">
+                                                Excellent
+                                            </span>
+                                        {% elif record.credit_score >= 700 %}
+                                            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
+                                                Good
+                                            </span>
+                                        {% elif record.credit_score >= 600 %}
+                                            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-warning-100 text-warning-800">
+                                                Fair
+                                            </span>
+                                        {% else %}
+                                            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-danger-100 text-danger-800">
+                                                Poor
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="text-sm text-gray-500">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if record.emi_eligibility == 'Eligible' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-100 text-success-800">
+                                        <i class="fas fa-check-circle mr-1"></i>
+                                        Eligible
+                                    </span>
+                                {% elif record.emi_eligibility == 'Not Eligible' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-danger-100 text-danger-800">
+                                        <i class="fas fa-times-circle mr-1"></i>
+                                        Not Eligible
+                                    </span>
+                                {% else %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        <i class="fas fa-question-circle mr-1"></i>
+                                        Unknown
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {% if record.max_monthly_emi %}
+                                    <span class="font-semibold text-primary-600">₹{{ "{:,.0f}".format(record.max_monthly_emi) }}</span>
+                                {% else %}
+                                    <span class="text-gray-500">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {% if record.prediction_date %}
+                                    {{ record.prediction_date.split(' ')[0] if ' ' in record.prediction_date else record.prediction_date }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex items-center space-x-2">
+                                    <button onclick="viewRecord({{ record.id }})" 
+                                            class="text-primary-600 hover:text-primary-900 transition-colors duration-200"
+                                            title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button onclick="editRecord({{ record.id }})" 
+                                            class="text-warning-600 hover:text-warning-900 transition-colors duration-200"
+                                            title="Edit Record">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="deleteRecord({{ record.id }})" 
+                                            class="text-danger-600 hover:text-danger-900 transition-colors duration-200"
+                                            title="Delete Record">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center">
+                                    <i class="fas fa-database text-6xl text-gray-300 mb-4"></i>
+                                    <h3 class="text-lg font-medium text-gray-900 mb-2">No Records Found</h3>
+                                    <p class="text-gray-500 mb-6">Get started by creating your first EMI assessment.</p>
+                                    <a href="{{ url_for('predict_form') }}" 
+                                       class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-all duration-300 flex items-center">
+                                        <i class="fas fa-plus mr-2"></i>
+                                        Create Assessment
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if records %}
+        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+            <div class="flex-1 flex justify-between sm:hidden">
+                {% if has_prev %}
+                    <a href="{{ url_for('records', page=page-1) }}" 
+                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Previous
+                    </a>
+                {% endif %}
+                {% if has_next %}
+                    <a href="{{ url_for('records', page=page+1) }}" 
+                       class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Next
+                    </a>
+                {% endif %}
+            </div>
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm text-gray-700">
+                        Showing page <span class="font-medium">{{ page }}</span> of customer records
+                    </p>
+                </div>
+                <div>
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        {% if has_prev %}
+                            <a href="{{ url_for('records', page=page-1) }}" 
+                               class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        {% endif %}
+                        
+                        {% if page > 2 %}
+                            <a href="{{ url_for('records', page=1) }}" 
+                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                1
+                            </a>
+                            {% if page > 3 %}
+                                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                                    ...
+                                </span>
+                            {% endif %}
+                        {% endif %}
+                        
+                        {% if has_prev %}
+                            <a href="{{ url_for('records', page=page-1) }}" 
+                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                {{ page - 1 }}
+                            </a>
+                        {% endif %}
+                        
+                        <span aria-current="page" 
+                              class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-primary-50 text-sm font-medium text-primary-600">
+                            {{ page }}
+                        </span>
+                        
+                        {% if has_next %}
+                            <a href="{{ url_for('records', page=page+1) }}" 
+                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                {{ page + 1 }}
+                            </a>
+                        {% endif %}
+                        
+                        {% if has_next %}
+                            <a href="{{ url_for('records', page=page+1) }}" 
+                               class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Record Detail Modal -->
+<div id="record-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-screen overflow-y-auto">
+        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h3 class="text-lg font-medium text-gray-900" id="modal-title">Customer Record Details</h3>
+            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        <div class="px-6 py-4" id="modal-content">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+        <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+            <button onclick="closeModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let allRecords = {{ records | tojson if records else '[]' }};
+    let filteredRecords = [...allRecords];
+    let currentSort = { column: null, direction: 'asc' };
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+        updateQuickStats();
+        setupEventListeners();
+    });
+
+    function setupEventListeners() {
+        // Search functionality
+        document.getElementById('search').addEventListener('input', filterRecords);
+        document.getElementById('eligibility-filter').addEventListener('change', filterRecords);
+        document.getElementById('date-filter').addEventListener('change', filterRecords);
+    }
+
+    function updateQuickStats() {
+        if (allRecords.length === 0) return;
+
+        const eligible = allRecords.filter(r => r.emi_eligibility === 'Eligible').length;
+        const notEligible = allRecords.filter(r => r.emi_eligibility === 'Not Eligible').length;
+        const avgEmi = allRecords
+            .filter(r => r.max_monthly_emi)
+            .reduce((sum, r, _, arr) => sum + r.max_monthly_emi / arr.length, 0);
+
+        document.getElementById('eligible-count').textContent = eligible;
+        document.getElementById('not-eligible-count').textContent = notEligible;
+        document.getElementById('avg-emi').textContent = avgEmi > 0 ? formatCurrency(avgEmi) : '-';
+    }
+
+    function filterRecords() {
+        const searchTerm = document.getElementById('search').value.toLowerCase();
+        const eligibilityFilter = document.getElementById('eligibility-filter').value;
+        const dateFilter = document.getElementById('date-filter').value;
+
+        filteredRecords = allRecords.filter(record => {
+            // Search filter
+            const matchesSearch = !searchTerm || 
+                record.id.toString().includes(searchTerm) ||
+                (record.age && record.age.toString().includes(searchTerm)) ||
+                (record.monthly_salary && record.monthly_salary.toString().includes(searchTerm)) ||
+                (record.gender && record.gender.toLowerCase().includes(searchTerm));
+
+            // Eligibility filter
+            const matchesEligibility = !eligibilityFilter || record.emi_eligibility === eligibilityFilter;
+
+            // Date filter (simplified - in real app, you'd parse actual dates)
+            const matchesDate = !dateFilter; // For now, show all dates
+
+            return matchesSearch && matchesEligibility && matchesDate;
+        });
+
+        renderFilteredRecords();
+    }
+
+    function renderFilteredRecords() {
+        const tbody = document.getElementById('records-tbody');
+        if (filteredRecords.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="px-6 py-12 text-center">
+                        <div class="flex flex-col items-center">
+                            <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">No Matching Records</h3>
+                            <p class="text-gray-500">Try adjusting your search or filter criteria.</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = filteredRecords.map(record => `
+            <tr class="hover:bg-gray-50 transition-colors duration-200">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    #${record.id}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center mr-3">
+                            <span class="text-primary-600 text-sm font-semibold">
+                                ${record.gender ? record.gender[0] : 'U'}
+                            </span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-gray-900">
+                                ${record.gender || 'Unknown'}, ${record.age || 'N/A'} years
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                Credit Score: ${record.credit_score || 'N/A'}
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${record.monthly_salary ? formatCurrency(record.monthly_salary) : 'N/A'}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    ${renderCreditScore(record.credit_score)}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    ${renderEligibilityBadge(record.emi_eligibility)}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${record.max_monthly_emi ? `<span class="font-semibold text-primary-600">${formatCurrency(record.max_monthly_emi)}</span>` : '<span class="text-gray-500">-</span>'}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${record.prediction_date ? record.prediction_date.split(' ')[0] : 'N/A'}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div class="flex items-center space-x-2">
+                        <button onclick="viewRecord(${record.id})" 
+                                class="text-primary-600 hover:text-primary-900 transition-colors duration-200"
+                                title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="editRecord(${record.id})" 
+                                class="text-warning-600 hover:text-warning-900 transition-colors duration-200"
+                                title="Edit Record">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteRecord(${record.id})" 
+                                class="text-danger-600 hover:text-danger-900 transition-colors duration-200"
+                                title="Delete Record">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderCreditScore(score) {
+        if (!score) return '<span class="text-sm text-gray-500">N/A</span>';
+        
+        let badgeClass = 'bg-gray-100 text-gray-800';
+        let label = 'Unknown';
+        
+        if (score >= 750) {
+            badgeClass = 'bg-success-100 text-success-800';
+            label = 'Excellent';
+        } else if (score >= 700) {
+            badgeClass = 'bg-primary-100 text-primary-800';
+            label = 'Good';
+        } else if (score >= 600) {
+            badgeClass = 'bg-warning-100 text-warning-800';
+            label = 'Fair';
+        } else {
+            badgeClass = 'bg-danger-100 text-danger-800';
+            label = 'Poor';
+        }
+        
+        return `
+            <div class="flex items-center">
+                <span class="text-sm font-medium text-gray-900">${score}</span>
+                <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeClass}">
+                    ${label}
+                </span>
+            </div>
+        `;
+    }
+
+    function renderEligibilityBadge(eligibility) {
+        if (eligibility === 'Eligible') {
+            return `
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-100 text-success-800">
+                    <i class="fas fa-check-circle mr-1"></i>
+                    Eligible
+                </span>
+            `;
+        } else if (eligibility === 'Not Eligible') {
+            return `
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-danger-100 text-danger-800">
+                    <i class="fas fa-times-circle mr-1"></i>
+                    Not Eligible
+                </span>
+            `;
+        } else {
+            return `
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    <i class="fas fa-question-circle mr-1"></i>
+                    Unknown
+                </span>
+            `;
+        }
+    }
+
+    function sortTable(column) {
+        if (currentSort.column === column) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSort.column = column;
+            currentSort.direction = 'asc';
+        }
+
+        filteredRecords.sort((a, b) => {
+            let valueA = a[column];
+            let valueB = b[column];
+
+            if (typeof valueA === 'string') {
+                valueA = valueA.toLowerCase();
+                valueB = valueB.toLowerCase();
+            }
+
+            if (currentSort.direction === 'asc') {
+                return valueA > valueB ? 1 : -1;
+            } else {
+                return valueA < valueB ? 1 : -1;
+            }
+        });
+
+        renderFilteredRecords();
+    }
+
+    function viewRecord(id) {
+        const record = allRecords.find(r => r.id === id);
+        if (!record) return;
+
+        document.getElementById('modal-title').textContent = `Customer Record #${id}`;
+        document.getElementById('modal-content').innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-900 mb-4">Personal Information</h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Age:</span>
+                            <span class="font-medium">${record.age || 'N/A'}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Gender:</span>
+                            <span class="font-medium">${record.gender || 'N/A'}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Monthly Salary:</span>
+                            <span class="font-medium">${record.monthly_salary ? formatCurrency(record.monthly_salary) : 'N/A'}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Credit Score:</span>
+                            <span class="font-medium">${record.credit_score || 'N/A'}</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-900 mb-4">Assessment Results</h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Eligibility:</span>
+                            ${renderEligibilityBadge(record.emi_eligibility)}
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Max Monthly EMI:</span>
+                            <span class="font-medium">${record.max_monthly_emi ? formatCurrency(record.max_monthly_emi) : 'N/A'}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Assessment Date:</span>
+                            <span class="font-medium">${record.prediction_date || 'N/A'}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('record-modal').classList.remove('hidden');
+        document.getElementById('record-modal').classList.add('flex');
+    }
+
+    function editRecord(id) {
+        showNotification('Edit functionality coming soon!', 'info');
+    }
+
+    function deleteRecord(id) {
+        if (confirm('Are you sure you want to delete this record?')) {
+            showNotification('Delete functionality coming soon!', 'info');
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('record-modal').classList.add('hidden');
+        document.getElementById('record-modal').classList.remove('flex');
+    }
+
+    function exportRecords() {
+        const dataToExport = filteredRecords.length > 0 ? filteredRecords : allRecords;
+        const csv = convertToCSV(dataToExport);
+        downloadCSV(csv, 'emi_records.csv');
+        showNotification('Records exported successfully!', 'success');
+    }
+
+    function convertToCSV(data) {
+        if (data.length === 0) return '';
+        
+        const headers = Object.keys(data[0]);
+        const csvContent = [
+            headers.join(','),
+            ...data.map(row => headers.map(header => `"${row[header] || ''}"`).join(','))
+        ].join('\n');
+        
+        return csvContent;
+    }
+
+    function downloadCSV(csv, filename) {
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('record-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+</script>
+{% endblock %}

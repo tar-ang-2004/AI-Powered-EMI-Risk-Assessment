@@ -1,0 +1,7 @@
+Lender,Type,Interest Rate,EMI,Processing Fee,Total Interest,Total Payment,Approval Probability,Max Tenure
+State Bank of India,Public Sector Bank,9.0,15899.87,2500.0,72395.19,574895.19,59.2,84
+ICICI Bank,Private Bank,9.75,16074.97,7500.0,78698.94,586198.94,60.4,72
+Bajaj Finance,NBFC,12.0,16607.15,10000.0,97857.58,607857.58,74.8,60
+Tata Capital,NBFC,12.5,16726.81,12500.0,102165.26,614665.26,64.9,48
+PaySense (Digital Lender),Fintech,14.0,17088.81,10000.0,115197.34,625197.34,77.4,36
+MoneyTap,Fintech,14.5,17210.49,8000.0,119577.59,627577.59,78.6,24

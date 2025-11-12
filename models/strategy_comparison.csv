@@ -1,0 +1,5 @@
+Strategy,EMI,Total_Cost,Savings,Description
+Balance Transfer,12601.116785829423,758067.0071497654,42733.10950669809,"Transfer to 9.5% rate with ₹2,000 fee"
+Balance Transfer + Prepayment,10774.706111942458,766998.6108676007,33801.50578886282,"BT to 9.5% + prepay ₹80,000 (Month 6)"
+Continue Current Loan,13346.668610941058,800800.1166564635,0.0,No changes to current loan structure
+Prepayment (Month 6),11422.142004849598,811758.8756570977,-10958.759000634192,"Prepay ₹80,000 after 6 months"

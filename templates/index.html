@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+
+{% block title %}Home - EMI Risk Assessment Platform{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative overflow-hidden">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="text-center">
+            <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6 animate-fade-in">
+                <span class="bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
+                    EMI Risk Assessment
+                </span>
+                <br>
+                <span class="text-4xl md:text-5xl">Platform</span>
+            </h1>
+            <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto animate-slide-in">
+                Leverage advanced machine learning algorithms to predict EMI eligibility and assess financial risk with 
+                unprecedented accuracy. Make informed lending decisions with our comprehensive AI-powered platform.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center animate-slide-in">
+                <a href="{{ url_for('predict_form') }}" 
+                   class="glassmorphism-button inline-flex items-center px-8 py-4 backdrop-blur-md bg-primary-600/80 text-white font-semibold rounded-lg shadow-lg hover:bg-primary-700/90 transform hover:scale-105 transition-all duration-300 border border-white/30">
+                    <i class="fas fa-chart-line mr-3"></i>
+                    Start Prediction
+                </a>
+                <a href="{{ url_for('dashboard') }}" 
+                   class="glassmorphism-button inline-flex items-center px-8 py-4 backdrop-blur-md bg-white/30 text-primary-600 font-semibold rounded-lg border-2 border-white/40 hover:bg-white/50 transform hover:scale-105 transition-all duration-300">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    View Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">Platform Features</h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                Comprehensive financial risk assessment powered by machine learning and advanced analytics
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-8 card-hover">
+                <div class="w-16 h-16 glassmorphism-card backdrop-blur-md bg-primary-500/20 border border-white/30 rounded-lg flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-brain text-2xl text-primary-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">AI-Powered Predictions</h3>
+                <p class="text-gray-600 mb-6">
+                    Advanced machine learning models trained on 400,000+ financial records to predict EMI eligibility with high accuracy.
+                </p>
+                <ul class="space-y-2 text-sm text-gray-500">
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-success-500 mr-2"></i>
+                        XGBoost & LightGBM Models
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-success-500 mr-2"></i>
+                        Real-time Predictions
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-success-500 mr-2"></i>
+                        High Accuracy Rates
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Feature 2 -->
+            <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-8 card-hover">
+                <div class="w-16 h-16 glassmorphism-card backdrop-blur-md bg-success-500/20 border border-white/30 rounded-lg flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-shield-alt text-2xl text-success-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Risk Assessment</h3>
+                <p class="text-gray-600 mb-6">
+                    Comprehensive financial risk evaluation considering multiple factors including credit score, income, and debt ratios.
+                </p>
+                <ul class="space-y-2 text-sm text-gray-500">
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-success-500 mr-2"></i>
+                        Multi-factor Analysis
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-success-500 mr-2"></i>
+                        Risk Categorization
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-success-500 mr-2"></i>
+                        Detailed Reports
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-8 card-hover">
+                <div class="w-16 h-16 glassmorphism-card backdrop-blur-md bg-warning-500/20 border border-white/30 rounded-lg flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-chart-bar text-2xl text-warning-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Analytics Dashboard</h3>
+                <p class="text-gray-600 mb-6">
+                    Interactive dashboards with real-time analytics, visualizations, and insights for better decision making.
+                </p>
+                <ul class="space-y-2 text-sm text-gray-500">
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-success-500 mr-2"></i>
+                        Real-time Analytics
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-success-500 mr-2"></i>
+                        Interactive Charts
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-success-500 mr-2"></i>
+                        Export Options
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Feature 4 -->
+            <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-8 card-hover">
+                <div class="w-16 h-16 glassmorphism-card backdrop-blur-md bg-purple-500/20 border border-white/30 rounded-lg flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-database text-2xl text-purple-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Data Management</h3>
+                <p class="text-gray-600 mb-6">
+                    Complete CRUD operations for customer data with secure storage and efficient data management capabilities.
+                </p>
+                <ul class="space-y-2 text-sm text-gray-500">
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-success-500 mr-2"></i>
+                        Secure Storage
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-success-500 mr-2"></i>
+                        CRUD Operations
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-success-500 mr-2"></i>
+                        Data Export
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Feature 5 -->
+            <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-8 card-hover">
+                <div class="w-16 h-16 glassmorphism-card backdrop-blur-md bg-indigo-500/20 border border-white/30 rounded-lg flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-cogs text-2xl text-indigo-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">MLflow Integration</h3>
+                <p class="text-gray-600 mb-6">
+                    Complete model lifecycle management with MLflow for experiment tracking, model versioning, and deployment.
+                </p>
+                <ul class="space-y-2 text-sm text-gray-500">
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-success-500 mr-2"></i>
+                        Model Tracking
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-success-500 mr-2"></i>
+                        Version Control
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-success-500 mr-2"></i>
+                        Performance Monitoring
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Feature 6 -->
+            <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-8 card-hover">
+                <div class="w-16 h-16 glassmorphism-card backdrop-blur-md bg-red-500/20 border border-white/30 rounded-lg flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-mobile-alt text-2xl text-red-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Responsive Design</h3>
+                <p class="text-gray-600 mb-6">
+                    Modern, responsive web interface that works seamlessly across all devices and screen sizes.
+                </p>
+                <ul class="space-y-2 text-sm text-gray-500">
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-success-500 mr-2"></i>
+                        Mobile Optimized
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-success-500 mr-2"></i>
+                        Cross-platform
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-success-500 mr-2"></i>
+                        Modern UI/UX
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">Platform Statistics</h2>
+            <p class="text-xl text-gray-600">Real-time insights into our platform performance</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-8 text-center card-hover">
+                <div class="w-16 h-16 glassmorphism-card backdrop-blur-md bg-primary-500/20 border border-white/30 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="fas fa-users text-2xl text-primary-600"></i>
+                </div>
+                <h3 class="text-3xl font-bold text-gray-900 mb-2">400K+</h3>
+                <p class="text-gray-600">Training Records</p>
+            </div>
+            
+            <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-8 text-center card-hover">
+                <div class="w-16 h-16 glassmorphism-card backdrop-blur-md bg-success-500/20 border border-white/30 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="fas fa-percentage text-2xl text-success-600"></i>
+                </div>
+                <h3 class="text-3xl font-bold text-gray-900 mb-2">94.2%</h3>
+                <p class="text-gray-600">Model Accuracy</p>
+            </div>
+            
+            <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-8 text-center card-hover">
+                <div class="w-16 h-16 glassmorphism-card backdrop-blur-md bg-warning-500/20 border border-white/30 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="fas fa-clock text-2xl text-warning-600"></i>
+                </div>
+                <h3 class="text-3xl font-bold text-gray-900 mb-2">&lt;2s</h3>
+                <p class="text-gray-600">Prediction Time</p>
+            </div>
+            
+            <div class="glassmorphism-card backdrop-blur-md bg-white/25 border border-white/20 rounded-2xl shadow-xl shadow-blue-100/25 p-8 text-center card-hover">
+                <div class="w-16 h-16 glassmorphism-card backdrop-blur-md bg-purple-500/20 border border-white/30 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="fas fa-chart-line text-2xl text-purple-600"></i>
+                </div>
+                <h3 class="text-3xl font-bold text-gray-900 mb-2">22</h3>
+                <p class="text-gray-600">Feature Variables</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                Simple 4-step process to get comprehensive EMI eligibility assessment
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <!-- Step 1 -->
+            <div class="text-center">
+                <div class="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6 relative">
+                    <span class="text-2xl font-bold text-primary-600">1</span>
+                    <div class="absolute -right-8 top-1/2 transform -translate-y-1/2 hidden md:block">
+                        <i class="fas fa-arrow-right text-gray-300 text-xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Input Data</h3>
+                <p class="text-gray-600">
+                    Enter customer financial information including income, expenses, credit score, and loan requirements.
+                </p>
+            </div>
+            
+            <!-- Step 2 -->
+            <div class="text-center">
+                <div class="w-20 h-20 bg-success-100 rounded-full flex items-center justify-center mx-auto mb-6 relative">
+                    <span class="text-2xl font-bold text-success-600">2</span>
+                    <div class="absolute -right-8 top-1/2 transform -translate-y-1/2 hidden md:block">
+                        <i class="fas fa-arrow-right text-gray-300 text-xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">AI Analysis</h3>
+                <p class="text-gray-600">
+                    Our machine learning models analyze the data using advanced algorithms and feature engineering.
+                </p>
+            </div>
+            
+            <!-- Step 3 -->
+            <div class="text-center">
+                <div class="w-20 h-20 bg-warning-100 rounded-full flex items-center justify-center mx-auto mb-6 relative">
+                    <span class="text-2xl font-bold text-warning-600">3</span>
+                    <div class="absolute -right-8 top-1/2 transform -translate-y-1/2 hidden md:block">
+                        <i class="fas fa-arrow-right text-gray-300 text-xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Risk Assessment</h3>
+                <p class="text-gray-600">
+                    Comprehensive risk evaluation considering multiple financial factors and lending criteria.
+                </p>
+            </div>
+            
+            <!-- Step 4 -->
+            <div class="text-center">
+                <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span class="text-2xl font-bold text-purple-600">4</span>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Get Results</h3>
+                <p class="text-gray-600">
+                    Receive detailed eligibility prediction, maximum EMI amount, and risk assessment report.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-16 gradient-bg">
+    <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+        <h2 class="text-4xl font-bold text-white mb-6">
+            Ready to Get Started?
+        </h2>
+        <p class="text-xl text-white opacity-90 mb-8">
+            Experience the power of AI-driven EMI risk assessment. Start making smarter lending decisions today.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{{ url_for('predict_form') }}" 
+               class="glassmorphism-button inline-flex items-center px-8 py-4 backdrop-blur-md bg-white/30 text-white font-semibold rounded-lg border-2 border-white/40 hover:bg-white/50 hover:text-primary-600 transform hover:scale-105 transition-all duration-300">
+                <i class="fas fa-chart-line mr-3"></i>
+                Start Risk Assessment
+            </a>
+            <a href="{{ url_for('dashboard') }}" 
+               class="glassmorphism-button inline-flex items-center px-8 py-4 backdrop-blur-md bg-transparent text-white font-semibold rounded-lg border-2 border-white/40 hover:bg-white/30 hover:text-primary-600 transform hover:scale-105 transition-all duration-300">
+                <i class="fas fa-tachometer-alt mr-3"></i>
+                Explore Dashboard
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add animation when elements come into view
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-slide-in');
+            }
+        });
+    }, observerOptions);
+
+    // Observe all cards and sections
+    document.querySelectorAll('.card-hover, .text-center > h2').forEach(el => {
+        observer.observe(el);
+    });
+
+    // Add floating animation to statistics numbers
+    setInterval(() => {
+        document.querySelectorAll('.text-3xl.font-bold').forEach((el, index) => {
+            setTimeout(() => {
+                el.style.transform = 'translateY(-2px)';
+                setTimeout(() => {
+                    el.style.transform = 'translateY(0)';
+                }, 300);
+            }, index * 100);
+        });
+    }, 3000);
+</script>
+{% endblock %}
