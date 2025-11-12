@@ -661,59 +661,37 @@ setInterval(updateDashboard, 5000);
 
 ## Charts & Visualizations
 
-### Jupyter Notebook Visualizations
+This project includes comprehensive visualizations across two main categories:
 
-The project includes comprehensive data visualizations generated in the Jupyter notebook:
+### 📊 Data Analysis Charts (from Jupyter Notebook)
 
-#### 1. Data Distribution Charts
-![Data Distribution](static/images/charts/data_distribution.png)
-- Histogram of key numerical features
-- Box plots for outlier detection
-- Density plots for distribution analysis
+Our data analysis produced several key visualizations that provide insights into the dataset:
 
-#### 2. Correlation Analysis
-![Correlation Matrix](static/images/charts/correlation_matrix.png)
-- Heatmap of feature correlations
-- Feature importance rankings
-- Target variable relationships
+| Chart | Description | Key Insights |
+|-------|-------------|--------------|
+| ![Financial Features Distribution](Charts/Financial%20Features%20Distribution.png) | **Financial Features Distribution** | Shows distribution patterns of salary, EMI amounts, and credit scores across the dataset |
+| ![Heatmap of Numerical Features](Charts/Heatmap%20of%20Numerical%20Features.png) | **Correlation Heatmap** | Reveals strong correlations between income, credit score, and eligibility outcomes |
+| ![Model Metrics](Charts/Model%20Metrics.png) | **Model Performance Metrics** | Comprehensive evaluation showing 94.2% accuracy for classification and 0.87 R² for regression |
+| ![Models Comparison](Charts/Models%20Comparision.png) | **Algorithm Comparison** | Side-by-side performance analysis of XGBoost, Random Forest, and Gradient Boosting models |
 
-#### 3. Model Performance Plots
-![Model Performance](static/images/charts/model_performance.png)
-- ROC curves for classification models
-- Residual plots for regression analysis
-- Learning curves and validation scores
+### 🖥️ Web Application Screenshots
 
-#### 4. Feature Importance
-![Feature Importance](static/images/charts/feature_importance.png)
-- SHAP value plots
-- Permutation importance rankings
-- Feature interaction effects
+Complete documentation of the Flask web application interface:
 
-### Web Application Screenshots
+#### Main Application Views
+| View | Screenshot | Features |
+|------|------------|----------|
+| **Homepage** | ![Home 1](Flask%20App%20Images/Home_01.png) ![Home 2](Flask%20App%20Images/Home_02.png) ![Home 3](Flask%20App%20Images/Home_03.png) | Landing page, navigation, feature overview |
+| **Prediction Interface** | ![Predict 1](Flask%20App%20Images/Predict_01.png) ![Predict 2](Flask%20App%20Images/Predict_02.png) ![Predict 3](Flask%20App%20Images/Predict_03.png) | User input form, results display, confidence scores |
+| **Dashboard Analytics** | ![Dashboard 1](Flask%20App%20Images/Dashboard_01.png) ![Dashboard 2](Flask%20App%20Images/Dashboard_02.png) | Real-time metrics, interactive charts, KPIs |
 
-#### Homepage
-![Homepage](static/images/flask_app/homepage.png)
-- Clean, professional landing page
-- Navigation menu and key features
-- Call-to-action buttons
-
-#### Prediction Interface
-![Prediction Page](static/images/flask_app/prediction_page.png)
-- User-friendly form interface
-- Real-time validation
-- Results display with confidence scores
-
-#### Dashboard
-![Dashboard](static/images/flask_app/dashboard.png)
-- Interactive charts and KPIs
-- Real-time data updates
-- System monitoring widgets
-
-#### Mobile Responsive
-![Mobile View](static/images/flask_app/mobile_view.png)
-- Optimized for mobile devices
-- Touch-friendly interface
-- Responsive layout adaptation
+#### Advanced Features
+| Feature | Screenshot | Functionality |
+|---------|------------|---------------|
+| **EMI Calculator** | ![Calculator](Flask%20App%20Images/Calculate_01.png) | Loan amount calculations and EMI planning |
+| **Prepayment Analysis** | ![Prepayment 1](Flask%20App%20Images/Prepayment_01.png) ![Prepayment 2](Flask%20App%20Images/Prepayment_02.png) ![Prepayment 3](Flask%20App%20Images/Prepayment)03.png) ![Prepayment 4](Flask%20App%20Images/Prepayment_04.png) | Prepayment strategies, savings calculations, scenario modeling |
+| **What-If Scenarios** | ![Scenario 1](Flask%20App%20Images/Scenerio_01.png) ![Scenario 2](Flask%20App%20Images/Scenerio_02.png) | Scenario analysis, comparative modeling, sensitivity analysis |
+| **Model Information** | ![Models](Flask%20App%20Images/Models.png) | Model statistics, performance metrics, technical details |
 
 ## Database Schema
 
